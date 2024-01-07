@@ -5,6 +5,7 @@ module.exports = {
     printWidth: 100,
     bracketSameLine: true,
     trailingComma: 'es5',
+    experimentalTernaries: true,
     plugins: [],
     overrides: [
         {

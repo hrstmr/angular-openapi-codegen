@@ -2,6 +2,8 @@
 
 command to create the type form schema `npx openapi-typescript pokeapi.yml --output pokeapi.ts`
 
+https://petstore3.swagger.io/#/
+
 # AngularOpenapiCodgen
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.9.
