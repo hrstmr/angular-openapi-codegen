@@ -22,5 +22,27 @@ export class AppComponent {
 
     test() {
         this.api.get('/store/inventory').subscribe((x) => console.log(x));
+        this.api
+            .post('/pet', {
+                body: {
+                    id: 10,
+                    name: 'doggie',
+                    category: {
+                        id: 1,
+                        name: 'Dogs',
+                    },
+                    photoUrls: ['string'],
+                    tags: [
+                        {
+                            id: 0,
+                            name: 'string',
+                        },
+                    ],
+                    status: 'available',
+                },
+            })
+            .subscribe((x) => console.log(x));
+
+        this.api.post('/pet/{petId}', {}).subscribe((x) => console.log(x));
     }
 }

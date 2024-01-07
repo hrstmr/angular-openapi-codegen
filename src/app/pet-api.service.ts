@@ -17,7 +17,26 @@ type PutPaths = ExtractPathFromVerbs<PathStrings, 'put'>;
 type DeletePaths = ExtractPathFromVerbs<PathStrings, 'delete'>;
 type PatchPaths = ExtractPathFromVerbs<PathStrings, 'patch'>;
 
-const x: GetPaths = '/store/order/{orderId}';
+type params = Paths['/user/login']['get'];
+const x: Paths = null!;
+type Response<Path extends PostPaths> = Paths[Path]['post'] extends {
+    requestBody: { content: { 'application/json': infer Req } };
+}
+    ? Req
+    : never;
+
+type RequestBody<Path extends PostPaths> = Response<Path> extends never
+    ? { body?: undefined }
+    : { body: Response<Path> };
+
+type HttpOptions = Parameters<HttpClient['post']>[2];
+
+const opt: HttpOptions = {
+    // body: {
+    //     name: 'sadf',
+    //     photoUrls: [],
+    // },
+};
 
 @Injectable({ providedIn: 'root' })
 export class PetApiService {
@@ -25,5 +44,9 @@ export class PetApiService {
     #baseUrl = 'https://petstore3.swagger.io/api/v3' as const;
     get<Path extends GetPaths>(url: Path) {
         return this.#http.get(this.#baseUrl + url);
+    }
+
+    post<Path extends PostPaths>(url: Path, opt: HttpOptions & RequestBody<Path>) {
+        return this.#http.post(this.#baseUrl + url, opt.body ?? null);
     }
 }
