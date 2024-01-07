@@ -19,24 +19,17 @@ type PatchPaths = ExtractPathFromVerbs<PathStrings, 'patch'>;
 
 type params = Paths['/user/login']['get'];
 const x: Paths = null!;
-type Response<Path extends PostPaths> = Paths[Path]['post'] extends {
+type RequestBody<Path extends PostPaths> = Paths[Path]['post'] extends {
     requestBody: { content: { 'application/json': infer Req } };
 }
     ? Req
     : never;
 
-type RequestBody<Path extends PostPaths> = Response<Path> extends never
+type RequestBodyExtender<Path extends PostPaths> = RequestBody<Path> extends never
     ? { body?: undefined }
-    : { body: Response<Path> };
+    : { body: RequestBody<Path> };
 
 type HttpOptions = Parameters<HttpClient['post']>[2];
-
-const opt: HttpOptions = {
-    // body: {
-    //     name: 'sadf',
-    //     photoUrls: [],
-    // },
-};
 
 @Injectable({ providedIn: 'root' })
 export class PetApiService {
@@ -46,7 +39,7 @@ export class PetApiService {
         return this.#http.get(this.#baseUrl + url);
     }
 
-    post<Path extends PostPaths>(url: Path, opt: HttpOptions & RequestBody<Path>) {
+    post<Path extends PostPaths>(url: Path, opt: HttpOptions & RequestBodyExtender<Path>) {
         return this.#http.post(this.#baseUrl + url, opt.body ?? null);
     }
 }
