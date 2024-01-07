@@ -21,7 +21,7 @@ export class AppComponent {
     }
 
     test() {
-        this.api.get('/store/inventory').subscribe((x) => console.log(x));
+        this.api.get('/store/inventory', {}).subscribe((x) => console.log(x));
         this.api
             .post('/pet', {
                 body: {

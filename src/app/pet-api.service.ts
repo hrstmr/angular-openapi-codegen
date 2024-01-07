@@ -18,17 +18,23 @@ type DeletePaths = ExtractPathFromVerbs<PathStrings, 'delete'>;
 type PatchPaths = ExtractPathFromVerbs<PathStrings, 'patch'>;
 
 const x: Paths = null!;
-type RequestBody<Path extends PostPaths> = Paths[Path]['post'] extends {
-    requestBody: { content: { 'application/json': infer Req } };
+type RequestBody<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = Paths[Path][Verb] extends {
+    requestBody: { content: { 'application/json': infer Body } };
 }
-    ? Req
+    ? Body
     : never;
 
-type RequestBodyExtender<Path extends PostPaths> = RequestBody<Path> extends never
+type RequestBodyExtender<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = RequestBody<Path, Verb> extends never
     ? { body?: undefined }
-    : { body: RequestBody<Path> };
+    : { body: RequestBody<Path, Verb> };
 
-type params = Paths['/pet/{petId}']['post']['parameters']['query'];
+type params = Paths['/pet/{petId}']['get']['responses']['400'];
 type params1 = Paths['/pet/{petId}']['post'];
 // const x1: params1 = { parameters: { path: { petId: 1 } } };
 // const x2: params1 = { parameters: { path: { petId: 1 } } };
@@ -56,12 +62,19 @@ type QueryParameter<
 }
     ? Param
     : never;
+type NgParams = Record<
+    string,
+    string | number | boolean | ReadonlyArray<string | number | boolean>
+>;
+
 type QueryParameterExtender<
     Path extends PathStrings,
     Verb extends Verbs & keyof Paths[Path]
 > = QueryParameter<Path, Verb> extends never
     ? { queryParams?: undefined }
-    : { queryParams: QueryParameter<Path, Verb> };
+    : {
+          queryParams: QueryParameter<Path, Verb> & NgParams;
+      };
 
 type HttpOptions = Parameters<HttpClient[Verbs]>[2] & { responseType?: 'json' };
 
@@ -78,24 +91,31 @@ export class PetApiService {
     #http = inject(HttpClient);
     #baseUrl = 'https://petstore3.swagger.io/api/v3' as const;
 
-    get<Path extends GetPaths>(url: Path) {
+    get<Path extends GetPaths>(
+        url: Path,
+        opt: HttpOptions &
+            RequestBodyExtender<Path, 'get'> &
+            PathParameterExtender<Path, 'get'> &
+            QueryParameterExtender<Path, 'get'>
+    ) {
         return this.#http.get(this.#baseUrl + url);
     }
 
     post<Path extends PostPaths>(
         url: Path,
         opt: HttpOptions &
-            RequestBodyExtender<Path> &
+            RequestBodyExtender<Path, 'post'> &
             PathParameterExtender<Path, 'post'> &
             QueryParameterExtender<Path, 'post'>
     ) {
-        const { body, pathParams } = opt;
+        const { body, pathParams, queryParams } = opt;
+        opt.params = queryParams;
         let requestPath: string = url;
         Object.entries(pathParams ?? {}).forEach(([key, value]) => {
             if (typeof value !== 'bigint' && typeof value !== 'number' && typeof value !== 'string')
                 return;
             requestPath = requestPath.replace(`{${key}}`, value.toString());
         });
-        return this.#http.post(this.#baseUrl + requestPath, opt.body ?? null, opt);
+        return this.#http.post(this.#baseUrl + requestPath, body ?? null, opt);
     }
 }
