@@ -3438,7 +3438,7 @@ components:
         baby_trigger_item:
           nullable: true
           oneOf:
-            - type: null
+            - type: "object"
             - $ref: "#/components/schemas/Item"
           description: The item that a baby Pokémon would be holding when born during a forced evolution
         chain:
@@ -3458,7 +3458,7 @@ components:
                 properties:
                   item:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/Item"
                   trigger:
                     $ref: "#/components/schemas/EvolutionTrigger"
@@ -3468,19 +3468,19 @@ components:
                     description: The required female gender of the evolving Pokémon species. Must be either 1 or 2, or null if the Pokémon species has no gender or the gender is fixed.
                   held_item:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/Item"
                   known_move:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/Move"
                   known_move_type:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/Type"
                   location:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/Location"
                   min_level:
                     nullable: true
@@ -3503,11 +3503,11 @@ components:
                     description: Whether or not it must be raining in the overworld to evolve into this Pokémon species
                   party_species:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/PokemonSpecies"
                   party_type:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/Type"
                   relative_physical_stats:
                     nullable: true
@@ -3521,7 +3521,7 @@ components:
                     description: The required time of day. Day or night.
                   trade_species:
                     oneOf:
-                      - type: null
+                      - type: "object"
                       - $ref: "#/components/schemas/PokemonSpecies"
                   turn_upside_down:
                     type: boolean
