@@ -33,23 +33,45 @@ type params1 = Paths['/pet/{petId}']['post'];
 // const x1: params1 = { parameters: { path: { petId: 1 } } };
 // const x2: params1 = { parameters: { path: { petId: 1 } } };
 
-type PathParameter<Path extends PostPaths> = Paths[Path][Verbs & keyof Paths[Path]] extends {
-    parameters: { path: infer PathParam };
+type PathParameter<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = Paths[Path][Verb] extends {
+    parameters: { path?: infer PathParam };
 }
     ? PathParam
     : never;
-type PathParameterExtender<Path extends PostPaths> = PathParameter<Path> extends never
+type PathParameterExtender<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = PathParameter<Path, Verb> extends never
     ? { pathParams?: undefined }
-    : { pathParams: PathParameter<Path> };
+    : { pathParams: PathParameter<Path, Verb> };
+
+type QueryParameter<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = Paths[Path][Verb] extends {
+    parameters: { query?: infer Param };
+}
+    ? Param
+    : never;
+type QueryParameterExtender<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = QueryParameter<Path, Verb> extends never
+    ? { queryParams?: undefined }
+    : { queryParams: QueryParameter<Path, Verb> };
 
 type HttpOptions = Parameters<HttpClient[Verbs]>[2] & { responseType?: 'json' };
 
-type PathParamTest = HttpOptions & PathParameterExtender<'/pet/{petId}'>;
-const y: PathParamTest = {
-    pathParams: {
-        petId: 1,
-    },
-};
+type x = { one: { path?: number; query?: string }; two: { abc: boolean } } extends {
+    one: { path?: number };
+}
+    ? 'yes'
+    : 'no';
+
+type Test = QueryParameter<'/pet/{petId}', 'get'>;
 
 @Injectable({ providedIn: 'root' })
 export class PetApiService {
@@ -62,7 +84,10 @@ export class PetApiService {
 
     post<Path extends PostPaths>(
         url: Path,
-        opt: HttpOptions & RequestBodyExtender<Path> & PathParameterExtender<Path>
+        opt: HttpOptions &
+            RequestBodyExtender<Path> &
+            PathParameterExtender<Path, 'post'> &
+            QueryParameterExtender<Path, 'post'>
     ) {
         const { body, pathParams } = opt;
         let requestPath: string = url;
@@ -71,6 +96,6 @@ export class PetApiService {
                 return;
             requestPath = requestPath.replace(`{${key}}`, value.toString());
         });
-        return this.#http.post(this.#baseUrl + requestPath, opt.body ?? null);
+        return this.#http.post(this.#baseUrl + requestPath, opt.body ?? null, opt);
     }
 }

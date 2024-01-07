@@ -44,7 +44,12 @@ export class AppComponent {
             .subscribe((x) => console.log(x));
 
         this.api
-            .post('/pet/{petId}', { pathParams: { petId: 1 } })
+            .post('/pet/{petId}', {
+                pathParams: {
+                    petId: 1,
+                },
+                queryParams: { name: 'doggie', status: 'available' },
+            })
             .subscribe((x) => console.log(x));
     }
 }
