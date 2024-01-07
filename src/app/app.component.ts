@@ -43,6 +43,8 @@ export class AppComponent {
             })
             .subscribe((x) => console.log(x));
 
-        this.api.post('/pet/{petId}', {}).subscribe((x) => console.log(x));
+        this.api
+            .post('/pet/{petId}', { pathParams: { petId: 1 } })
+            .subscribe((x) => console.log(x));
     }
 }
