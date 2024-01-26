@@ -72,9 +72,7 @@ type QueryParameterExtender<
     Verb extends Verbs & keyof Paths[Path]
 > = QueryParameter<Path, Verb> extends never
     ? { queryParams?: undefined }
-    : {
-          queryParams: QueryParameter<Path, Verb> & NgParams;
-      };
+    : { queryParams: QueryParameter<Path, Verb> & NgParams };
 
 type HttpOptions = Parameters<HttpClient[Verbs]>[2] & { responseType?: 'json' };
 
