@@ -27,17 +27,9 @@ export class AppComponent {
                 body: {
                     id: 10,
                     name: 'doggie',
-                    category: {
-                        id: 1,
-                        name: 'Dogs',
-                    },
+                    category: { id: 1, name: 'Dogs' },
                     photoUrls: ['string'],
-                    tags: [
-                        {
-                            id: 0,
-                            name: 'string',
-                        },
-                    ],
+                    tags: [{ id: 0, name: 'string' }],
                     status: 'available',
                 },
             })
@@ -45,9 +37,7 @@ export class AppComponent {
 
         this.api
             .post('/pet/{petId}', {
-                pathParams: {
-                    petId: 1,
-                },
+                pathParams: { petId: 1 },
                 queryParams: { name: 'doggie', status: 'available' },
             })
             .subscribe((x) => console.log(x));
