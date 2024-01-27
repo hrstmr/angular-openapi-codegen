@@ -14,7 +14,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AppComponent {
     api = inject(PetApiService);
-    title = 'angular-openapi-codgen';
+    title = 'angular-openapi-codegen';
 
     abc() {
         this.test();

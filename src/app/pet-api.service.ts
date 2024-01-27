@@ -35,9 +35,21 @@ type RequestBodyExtender<
     : { body: RequestBody<Path, Verb> };
 
 type params = Paths['/pet/{petId}']['get']['responses']['400'];
+type params200 = Paths['/pet/{petId}']['get']['responses']['200']['content']['application/json'];
 type params1 = Paths['/pet/{petId}']['post'];
 // const x1: params1 = { parameters: { path: { petId: 1 } } };
 // const x2: params1 = { parameters: { path: { petId: 1 } } };
+
+type Response<
+    Path extends PathStrings,
+    Verb extends Verbs & keyof Paths[Path]
+> = Paths[Path][Verb] extends {
+    responses: { 200: { content: { 'application/json': infer Response } } };
+}
+    ? Response
+    : never;
+
+type xwe = Response<'/pet/{petId}', 'post'>;
 
 type PathParameter<
     Path extends PathStrings,
@@ -82,7 +94,7 @@ type x = { one: { path?: number; query?: string }; two: { abc: boolean } } exten
     ? 'yes'
     : 'no';
 
-type Test = QueryParameter<'/pet/{petId}', 'get'>;
+type Test = Response<'/store/inventory', 'get'>;
 
 @Injectable({ providedIn: 'root' })
 export class PetApiService {
@@ -96,7 +108,7 @@ export class PetApiService {
             PathParameterExtender<Path, 'get'> &
             QueryParameterExtender<Path, 'get'>
     ) {
-        return this.#http.get(this.#baseUrl + url);
+        return this.#http.get<Response<Path, 'get'>>(this.#baseUrl + url);
     }
 
     post<Path extends PostPaths>(
@@ -114,6 +126,10 @@ export class PetApiService {
                 return;
             requestPath = requestPath.replace(`{${key}}`, value.toString());
         });
-        return this.#http.post(this.#baseUrl + requestPath, body ?? null, opt);
+        return this.#http.post<Response<Path, 'post'>>(
+            this.#baseUrl + requestPath,
+            body ?? null,
+            opt
+        );
     }
 }
